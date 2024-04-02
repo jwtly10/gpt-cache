@@ -68,10 +68,46 @@ def test_query_exact_match(setup_annoy_index):
     handler = AnnoyHandler(embedding, annoy)
 
     context = "The language of the universe is mathematics."
-    distance_threshold = 0.0
+    distance_threshold = 0.01
 
     # returns {id: int/None, distance:float/None }
     response = handler.handle_query(context, distance_threshold)
 
     assert response["id"] == 6
     assert response["distance"] < 0.01
+
+
+def test_query_no_indexs_to_match():
+    # Define empty annoy index
+    annoy, embedding = (
+        AnnoyEmbeddingStorage(dimension=384),
+        SentenceEmbedding(model_name="all-MiniLM-L6-v2"),
+    )
+
+    # Build empty index
+    annoy.build_index(num_trees=10)
+
+    handler = AnnoyHandler(embedding, annoy)
+
+    context = "The quick fox who is brown jumps over the dog who is lazy"
+    distance_threshold = 0.01
+
+    response = handler.handle_query(context, distance_threshold)
+
+    # No match should be found
+    assert response["id"] is None
+    assert response["distance"] is None
+
+
+def test_query_closest_match(setup_annoy_index):
+    annoy, embedding = setup_annoy_index
+
+    handler = AnnoyHandler(embedding, annoy)
+
+    context = "The quick brown fox jumps over the dog who is lazy"
+    distance_threshold = 0.3
+
+    response = handler.handle_query(context, distance_threshold)
+
+    assert response["id"] == 1
+    assert response["distance"] < 0.3

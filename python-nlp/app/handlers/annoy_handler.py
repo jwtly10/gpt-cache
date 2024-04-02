@@ -74,23 +74,23 @@ class AnnoyHandler:
         if no such item is found within the threshold) and the 'distance' to this item
         (or `None` if no item is within the threshold).
         """
+        print(f"Querying with distance threshold: {distance_threshold}")
+
         # Create embedding for the query
         query_embedding = self.s.to_embedding(context)
 
-        # Get the closest neighbor and its distance
-        # nn_id, distance = self.a.get_nns_by_vector(
-        #     query_embedding, n=1, include_distances=True
-        # )
-
         nn_ids, distances = self.a.get_nns_by_vector(query_embedding, n=1)
-        print(f"Nearest neighbor ID: {nn_ids[0]}")
-        print(f"Distance: {distances[0]}")
-
-        # Similarity threshold
-        distance_threshold = 0.2
-
-        # Check if the closest neighbor is within the acceptable distance
-        if distances[0] <= distance_threshold:
-            return {"id": nn_ids[0], "distance": distances[0]}
+        if len(nn_ids) > 0:
+            print(f"Nearest neighbor ID: {nn_ids[0]}")
+            print(f"Distance: {distances[0]}")
+            # Check if the closest neighbor is within the acceptable distance
+            if distances[0] <= distance_threshold:
+                print("Nearest neighbor found within the distance threshold.")
+                return {"id": nn_ids[0], "distance": distances[0]}
+            else:
+                print("No neighbors found within the distance threshold.")
+                return {"id": None, "distance": None}
         else:
+            # Handles cases where the index is empty
+            print("No neighbors found in the index.")
             return {"id": None, "distance": None}
