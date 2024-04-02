@@ -1,2 +1,2 @@
 from .base import BaseEmbedding
-from .sentence import SentenceEmbedding
+from .sentence_embedding import SentenceEmbedding

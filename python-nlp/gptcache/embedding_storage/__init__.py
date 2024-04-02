@@ -1,2 +1,2 @@
 from .base import BaseEmbeddingStorage
-from .annoy import AnnoyEmbeddingStorage
+from .annoy_embedding_storage import AnnoyEmbeddingStorage
