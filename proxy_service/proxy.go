@@ -35,7 +35,7 @@ func (p *Proxy) Handle(w http.ResponseWriter, r *http.Request) {
 	var body []byte
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		http.Error(w, "go-gpt-cache: Failed to read original request body", http.StatusInternalServerError)
+		http.Error(w, "gpt-cache: Failed to read original request body", http.StatusInternalServerError)
 		return
 	}
 	log.Printf("Original Request body: %s", string(body))
@@ -47,14 +47,14 @@ func (p *Proxy) Handle(w http.ResponseWriter, r *http.Request) {
 
 	newReq, err := http.NewRequest(r.Method, p.targetURL+r.URL.String(), newRequestBody)
 	if err != nil {
-		http.Error(w, "go-gpt-cache: Failed to create new request", http.StatusInternalServerError)
+		http.Error(w, "gpt-cache: Failed to create new request", http.StatusInternalServerError)
 		return
 	}
 
 	copyHeaders(r.Header, newReq.Header)
 	resp, err := p.client.Do(newReq)
 	if err != nil {
-		http.Error(w, "go-gpt-cache: Failed to forward request", http.StatusInternalServerError)
+		http.Error(w, "gpt-cache: Failed to forward request", http.StatusInternalServerError)
 		return
 	}
 	defer resp.Body.Close()
