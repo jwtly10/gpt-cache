@@ -1,8 +1,6 @@
 import pytest
 
-from app.models.query_model import Query
-
-from app.handlers import AnnoyHandler
+from app.handlers.annoy_handler import AnnoyHandler
 
 from gptcache.embedding_storage import AnnoyEmbeddingStorage
 from gptcache.embedding import SentenceEmbedding
@@ -18,14 +16,12 @@ def test_handle_add_integration():
     query_id = 1
     query_context = "The quick brown fox jumps over the lazy dog."
 
-    test_query = Query(id=query_id, context=query_context)
-
     # Test
-    response = handler.handle_add(test_query)
+    response = handler.handle_add(query_id, query_context)
     if response["status"] == "error":
         print(response["message"])
 
-    assert response == {"status": "success"}
+    assert response == {"status": "success", "message": None}
 
 
 @pytest.fixture

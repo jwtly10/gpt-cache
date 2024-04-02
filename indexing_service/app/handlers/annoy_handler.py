@@ -1,8 +1,6 @@
 from gptcache.embedding import SentenceEmbedding
 from gptcache.embedding_storage import AnnoyEmbeddingStorage
 
-from app.models.query_model import Query
-
 
 class AnnoyHandler:
     def __init__(
@@ -13,7 +11,7 @@ class AnnoyHandler:
         self.s = embedding
         self.a = storage
 
-    def handle_add(self, query: Query) -> dict:
+    def handle_add(self, id: int, context: str) -> dict:
         """
         Adds a new query's embedding to the Annoy index using the query's unique ID as the key.
 
@@ -35,24 +33,16 @@ class AnnoyHandler:
         """
         try:
             # Create embedding for the query
-            query_embedding = self.s.to_embedding(query.context)
+            query_embedding = self.s.to_embedding(context)
 
             # Add the query to the Annoy index
-            self.a.add_item(query.id, query_embedding)
+            self.a.add_item(id, query_embedding)
         except Exception as e:
             return {"status": "error", "message": str(e)}
 
-        return {"status": "success"}
+        return {"status": "success", "message": None}
 
-    def rebuild_index(self):
-        """
-        Rebuilds the Annoy index in the background after adding a new item.
-        """
-        self.a.build_index(num_trees=10)
-        # TODO: Persist index?
-        # annoy.save('your_index_file.ann')
-
-    def handle_query(self, context: str, distance_threshold=0.2) -> dict:
+    def handle_query(self, context: str, distance_threshold: float) -> dict:
         """
         Handles a query request by generating an embedding for the given context and querying
         the Annoy index to find the closest neighbor and its distance.
@@ -94,3 +84,14 @@ class AnnoyHandler:
             # Handles cases where the index is empty
             print("No neighbors found in the index.")
             return {"id": None, "distance": None}
+
+    def rebuild_index(self):
+        """
+        Rebuilds the Annoy index in the background after adding a new item.
+        """
+        try:
+            self.a.build_index(num_trees=10)
+        except Exception as e:
+            print(f"An error occurred while rebuilding the index: {str(e)}")
+        # TODO: Persist index?
+        # annoy.save('your_index_file.ann')
