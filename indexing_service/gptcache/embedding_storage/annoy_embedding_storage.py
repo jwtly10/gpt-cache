@@ -1,6 +1,6 @@
 from gptcache.embedding_storage import BaseEmbeddingStorage
 from annoy import AnnoyIndex
-from typing import List, Tuple
+from typing import List
 
 
 class AnnoyEmbeddingStorage(BaseEmbeddingStorage):

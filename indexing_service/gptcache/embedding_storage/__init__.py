@@ -1,2 +1,3 @@
 from .base import BaseEmbeddingStorage
 from .annoy_embedding_storage import AnnoyEmbeddingStorage
+from .faiss_embedding_storage import FaissEmbeddingStorage
