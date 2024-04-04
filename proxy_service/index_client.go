@@ -8,8 +8,7 @@ import (
 )
 
 type IndexClient struct {
-	BaseUrl string
-	Client  Client
+	config IndexConfig
 }
 
 type QueryRequest struct {
@@ -36,10 +35,9 @@ type ErrResponse struct {
 	Detail string `json:"detail"`
 }
 
-func NewIndexClient(baseUrl string, client Client) *IndexClient {
+func NewIndexClient(config IndexConfig) *IndexClient {
 	return &IndexClient{
-		BaseUrl: baseUrl,
-		Client:  client,
+		config: config,
 	}
 }
 
@@ -63,14 +61,14 @@ func (i *IndexClient) QueryIndex(context string, distanceThreshold float32) (Que
 		return QueryResponse{}, err
 	}
 
-	req, err := http.NewRequest("POST", i.BaseUrl+endpoint, bytes.NewBuffer(reqBody))
+	req, err := http.NewRequest("POST", i.config.BaseUrl+endpoint, bytes.NewBuffer(reqBody))
 	if err != nil {
 		return QueryResponse{}, err
 	}
 
 	req.Header.Set("Content-Type", "application/json")
 
-	resp, err := i.Client.Do(req)
+	resp, err := i.config.Client.Do(req)
 	if err != nil {
 		return QueryResponse{}, err
 	}
@@ -122,14 +120,14 @@ func (i *IndexClient) AddIndex(id int64, context string) error {
 		return err
 	}
 
-	req, err := http.NewRequest("POST", i.BaseUrl+endpoint, bytes.NewBuffer(reqBody))
+	req, err := http.NewRequest("POST", i.config.BaseUrl+endpoint, bytes.NewBuffer(reqBody))
 	if err != nil {
 		return err
 	}
 
 	req.Header.Set("Content-Type", "application/json")
 
-	resp, err := i.Client.Do(req)
+	resp, err := i.config.Client.Do(req)
 	if err != nil {
 		return err
 	}

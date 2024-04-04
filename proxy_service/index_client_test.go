@@ -32,7 +32,13 @@ func TestQueryIndex(t *testing.T) {
 				}, nil
 			},
 		}
-		indexClient := NewIndexClient("http://example.com", client)
+
+		config := IndexConfig{
+			BaseUrl: "http://example.com",
+			Client:  client,
+		}
+
+		indexClient := NewIndexClient(config)
 		resp, err := indexClient.QueryIndex("test context", 0.5)
 		if err != nil {
 			t.Errorf("Expected no error, got %v", err)
@@ -51,8 +57,12 @@ func TestQueryIndex(t *testing.T) {
 				}, nil
 			},
 		}
+		config := IndexConfig{
+			BaseUrl: "http://example.com",
+			Client:  client,
+		}
 
-		indexClient := NewIndexClient("http://example.com", client)
+		indexClient := NewIndexClient(config)
 		resp, err := indexClient.QueryIndex("test context", 0.5)
 		if err != nil {
 			t.Errorf("Expect no error, just empty resp, got %v", err)
@@ -81,7 +91,12 @@ func TestQueryIndex(t *testing.T) {
 			},
 		}
 
-		indexClient := NewIndexClient("http://example.com", client)
+		config := IndexConfig{
+			BaseUrl: "http://example.com",
+			Client:  client,
+		}
+
+		indexClient := NewIndexClient(config)
 		_, err := indexClient.QueryIndex("test context", 0.5)
 
 		if err == nil {
@@ -112,7 +127,13 @@ func TestAddIndex(t *testing.T) {
 				}, nil
 			},
 		}
-		indexClient := NewIndexClient("http://example.com", client)
+
+		config := IndexConfig{
+			BaseUrl: "http://example.com",
+			Client:  client,
+		}
+
+		indexClient := NewIndexClient(config)
 		err := indexClient.AddIndex(1, "test context")
 		if err != nil {
 			t.Errorf("Expected no error, got %v", err)

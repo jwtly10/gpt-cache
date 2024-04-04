@@ -6,8 +6,13 @@ import (
 	"github.com/sashabaranov/go-openai"
 )
 
-type OpenAIParser struct {
+type Parser interface {
+	// Parse takes a request body as input and returns a slice of strings and an error.
+	// It parses the LLM Request and extracts the content of each message or "context"
+	Parse(reqBody string) ([]string, error)
 }
+
+type OpenAIParser struct{}
 
 func NewOpenAiParser() *OpenAIParser {
 	return &OpenAIParser{}

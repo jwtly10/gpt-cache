@@ -11,14 +11,16 @@ type CacheService struct {
 	cache       Cache
 	parser      Parser
 	indexClient IndexClient
+	config      CacheServiceConfig
 }
 
 // NewCacheService creates a new instance of CacheService with the provided cache, parser, and index client.
-func NewCacheService(cache Cache, parser Parser, indexClient IndexClient) *CacheService {
+func NewCacheService(cache Cache, parser Parser, indexClient IndexClient, config CacheServiceConfig) *CacheService {
 	return &CacheService{
 		cache:       cache,
 		parser:      parser,
 		indexClient: indexClient,
+		config:      config,
 	}
 }
 
@@ -38,7 +40,7 @@ func (c *CacheService) Get(ctx context.Context, context []string) ([]byte, error
 
 	// Step 1 - Get the cache key from index service
 	// TODO: make threshold configurable via injected service config
-	idRes, err := c.indexClient.QueryIndex(strings.Join(context, " "), 0.3)
+	idRes, err := c.indexClient.QueryIndex(strings.Join(context, " "), c.config.Threshold)
 	if err != nil {
 		return []byte{}, err
 	}

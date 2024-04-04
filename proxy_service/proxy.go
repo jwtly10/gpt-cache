@@ -9,22 +9,20 @@ import (
 )
 
 type Proxy struct {
-	client       Client
-	targetURL    string
+	config       ProxyConfig
 	cacheService CacheService
 }
 
-func NewProxy(client Client, targetURL string, cacheService CacheService) *Proxy {
+func NewProxy(config ProxyConfig, cacheService CacheService) *Proxy {
 	return &Proxy{
-		client:       client,
-		targetURL:    targetURL,
+		config:       config,
 		cacheService: cacheService,
 	}
 }
 
 func (p *Proxy) Handle(w http.ResponseWriter, r *http.Request) {
 
-	log.Printf("Target URL: %s", p.targetURL)
+	log.Printf("Target URL: %s", p.config.TargetUrl)
 	log.Printf("Original request: %s %s", r.Method, r.URL.String())
 
 	// Logging original headers
@@ -83,21 +81,21 @@ func (p *Proxy) Handle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Println("Cache miss, forwarding request to target")
-	log.Printf("Forwarding request to %s", p.targetURL+r.URL.String())
+	log.Printf("Forwarding request to %s", p.config.TargetUrl+r.URL.String())
 
 	// IMPORTANT: Restore the original body for further use
 	// This is required as io.ReadAll consumes the body, and it can't be read again
 	r.Body = io.NopCloser(bytes.NewBuffer(body))
 	newRequestBody := bytes.NewBuffer(body)
 
-	newReq, err := http.NewRequest(r.Method, p.targetURL+r.URL.String(), newRequestBody)
+	newReq, err := http.NewRequest(r.Method, p.config.TargetUrl+r.URL.String(), newRequestBody)
 	if err != nil {
 		http.Error(w, "gpt-cache: Failed to create new request", http.StatusInternalServerError)
 		return
 	}
 
 	copyHeaders(r.Header, newReq.Header)
-	resp, err := p.client.Do(newReq)
+	resp, err := p.config.Client.Do(newReq)
 	if err != nil {
 		http.Error(w, "gpt-cache: Failed to forward request", http.StatusInternalServerError)
 		return

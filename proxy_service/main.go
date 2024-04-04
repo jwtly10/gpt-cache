@@ -3,21 +3,23 @@ package main
 import (
 	"log"
 	"net/http"
-
-	"github.com/go-redis/redis"
 )
 
 func main() {
-	client := &DefaultClient{}
-	baseUrl := "https://api.openai.com/v1"
+
+	config := NewConfig()
+	log.Printf("Config Setup: %+v", config)
 
 	parser := NewOpenAiParser()
 
-	rdb := redis.NewClient(&redis.Options{
-		Addr:     "127.0.0.1:6379",
-		Password: "",
-		DB:       0,
-	})
+	// rdb := redis.NewClient(&redis.Options{
+	// 	// Addr:     "127.0.0.1:6379",
+	// 	Addr:     "redis:6379",
+	// 	Password: "",
+	// 	DB:       0,
+	// })
+
+	rdb := NewRedisClient(config.Redis)
 
 	log.Printf("TESTING. Flushing redis db.")
 	err := rdb.FlushDB().Err()
@@ -28,11 +30,11 @@ func main() {
 
 	cache := NewRedisCache(rdb)
 
-	IndexClient := NewIndexClient("http://localhost:8000", client)
+	IndexClient := NewIndexClient(config.Index)
 
-	cacheService := NewCacheService(cache, parser, *IndexClient)
+	cacheService := NewCacheService(cache, parser, *IndexClient, config.Cache)
 
-	proxyHandler := NewProxy(client, baseUrl, *cacheService)
+	proxyHandler := NewProxy(config.Proxy, *cacheService)
 
 	http.HandleFunc("/", proxyHandler.Handle)
 
