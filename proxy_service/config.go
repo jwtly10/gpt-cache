@@ -10,7 +10,9 @@ import (
 )
 
 type RedisConfig struct {
-	Addr string
+	Addr     string
+	Password string
+	DB       int
 }
 
 type IndexConfig struct {
@@ -42,10 +44,12 @@ func NewConfig() *Config {
 
 	defaultConfig := &Config{
 		Cache: CacheServiceConfig{
-			Threshold: 0.5,
+			Threshold: 0.2,
 		},
 		Redis: RedisConfig{
-			Addr: "127.0.0.1:6379",
+			Addr:     "127.0.0.1:6379",
+			Password: "",
+			DB:       0,
 		},
 		Index: IndexConfig{
 			BaseUrl: "http://localhost:8000",
@@ -69,6 +73,18 @@ func NewConfig() *Config {
 	if host := os.Getenv("REDIS_HOST_URL"); host != "" {
 		if port := os.Getenv("REDIS_PORT"); port != "" {
 			defaultConfig.Redis.Addr = fmt.Sprintf("%s:%s", host, port)
+		}
+	}
+
+	if pw := os.Getenv("REDIS_PASSWORD"); pw != "" {
+		defaultConfig.Redis.Password = pw
+	}
+
+	if db := os.Getenv("REDIS_DB"); db != "" {
+		if dbInt, err := strconv.Atoi(db); err == nil {
+			defaultConfig.Redis.DB = dbInt
+		} else {
+			log.Printf("Failed to parse REDIS_DB: %v, using default", err)
 		}
 	}
 

@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+    indexing_service:
+        build:
+            context: ./indexing_service
+        ports:
+            - '8000:8000'
+
+    proxy_service:
+        build:
+            context: ./proxy_service
+        ports:
+            - '8080:8080'
+        depends_on:
+            - redis
+        environment:
+            REDIS_HOST_URL: redis
+            REDIS_PORT: 6379
+            INDEX_HOST_URL: http://indexing_service
+            INDEX_PORT: 8000
+
+    redis:
+        image: 'redis:latest'
+        ports:
+            - '6379:6379'

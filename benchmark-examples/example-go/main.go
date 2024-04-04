@@ -57,12 +57,14 @@ func main() {
 
 	log.Println("Making the first request (No Cache hit) ...")
 	message := "How do you write to file in Java"
+	fmt.Println("Asking ChatGPT: ", message)
 	res1, _ := makeRequest(c, message)
 	benchmarks = append(benchmarks, res1)
 
 	fmt.Println()
 
 	log.Println("Making the second request (Cache hit) ...")
+	fmt.Println("Asking ChatGPT: ", message)
 	message = "Show me how to write to file in Java"
 	res2, _ := makeRequest(c, message)
 	benchmarks = append(benchmarks, res2)
