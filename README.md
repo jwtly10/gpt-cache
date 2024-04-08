@@ -68,7 +68,7 @@ j@mbp:~/Projects/gpt-cache/benchmark-examples/example-go$  go run .
 2024/04/04 18:15:52 Request 2 took: 66.482852ms
 ```
 
-As you can see, for a simple exact cache match request, the first request took 8.681519257s and the second request took 66.482852ms.
+As you can see, even though the requests were not the exact same, the first request took 8.681519257s and the second request took 66.482852ms.
 
 _Thats 130x times faster!_
 
